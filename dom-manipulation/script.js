@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const quoteDisplay = document.querySelector("#quoteDisplay");
-  const newQuote = document.querySelector("#newQuote");
+  const newQuote = document.getElementById("newQuote");
   const categorySelect = document.querySelector("#quoteCategoryFilter");
   const filterQuoteBtn = document.querySelector("#filterQuote");
 
