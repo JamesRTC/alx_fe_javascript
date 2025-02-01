@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const importFileInput = document.querySelector("#importFile");
   const exportQuotesBtn = document.querySelector("#exportQuotes");
 
+  // Simulate a mock server URL
+  const serverUrl = "https://jsonplaceholder.typicode.com/posts"; // Using JSONPlaceholder for simulation
+
   // Initialize the quotes array
   let quotes = [
     { text: "The only way to do great work is to love what you do.", category: "Motivation" },
@@ -48,38 +51,45 @@ document.addEventListener("DOMContentLoaded", () => {
     saveLastViewedQuote(randomQuote.text); // Save last viewed quote in sessionStorage
   }
 
-  function createAddQuoteForm() {
-    const formContainer = document.createElement("div");
-    formContainer.innerHTML = `
-      <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
-      <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
-      <button id="addNewQuote">Add Quote</button>
-    `;
-    document.body.appendChild(formContainer);
-
-    // Add event listener for adding new quotes
-    const addNewQuoteButton = formContainer.querySelector("#addNewQuote");
-    addNewQuoteButton.addEventListener("click", addQuote);
-  }
-
-  // Add new quote to the quotes array and update local storage
-  function addQuote() {
-    const newQuoteText = document.querySelector("#newQuoteText").value.trim();
-    const newQuoteCategory = document.querySelector("#newQuoteCategory").value.trim();
-
-    if (newQuoteText === "" || newQuoteCategory === "") {
-      alert("Please fill in both fields.");
-      return;
+  // Fetch quotes from the server
+  async function fetchQuotesFromServer() {
+    try {
+      const response = await fetch(serverUrl);
+      const data = await response.json();
+      return data.map((post) => ({
+        text: post.title, // Assuming title is the quote
+        category: "Imported", // Default category for imported quotes
+      }));
+    } catch (error) {
+      console.error("Error fetching quotes from the server:", error);
+      return [];
     }
-
-    const newQuote = { text: newQuoteText, category: newQuoteCategory };
-    quotes.push(newQuote);
-    saveQuotes();
-    showRandomQuote(); // Immediately show the new quote
-    populateCategories(); // Update the dropdown if a new category is added
-    document.querySelector("#newQuoteText").value = "";
-    document.querySelector("#newQuoteCategory").value = "";
   }
+
+  // Sync local quotes with the server data
+  async function syncWithServer() {
+    const serverQuotes = await fetchQuotesFromServer();
+
+    // Compare and update quotes - in case of conflict, server data takes precedence
+    serverQuotes.forEach((serverQuote) => {
+      const existingQuoteIndex = quotes.findIndex((localQuote) => localQuote.text === serverQuote.text);
+
+      if (existingQuoteIndex === -1) {
+        // New quote from the server, add it to the local storage
+        quotes.push(serverQuote);
+      } else {
+        // Conflict resolution: Server data takes precedence
+        quotes[existingQuoteIndex] = serverQuote;
+      }
+    });
+
+    saveQuotes();
+    populateCategories(); // Update category dropdown after sync
+    alert("Data synced with the server!");
+  }
+
+  // Simulate periodic syncing with the server (every 30 seconds)
+  setInterval(syncWithServer, 30000);
 
   // Populate the category dropdown dynamically
   function populateCategories() {
@@ -92,7 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
       categorySelect.appendChild(option);
     });
 
-    // Retrieve last selected category from localStorage
     const lastSelectedCategory = localStorage.getItem("lastSelectedCategory");
     if (lastSelectedCategory) {
       categorySelect.value = lastSelectedCategory;
@@ -116,6 +125,25 @@ document.addEventListener("DOMContentLoaded", () => {
         quoteDisplay.textContent = "No quotes available in this category.";
       }
     }
+  }
+
+  // Add new quote to the quotes array and update local storage
+  function addQuote() {
+    const newQuoteText = document.querySelector("#newQuoteText").value.trim();
+    const newQuoteCategory = document.querySelector("#newQuoteCategory").value.trim();
+
+    if (newQuoteText === "" || newQuoteCategory === "") {
+      alert("Please fill in both fields.");
+      return;
+    }
+
+    const newQuote = { text: newQuoteText, category: newQuoteCategory };
+    quotes.push(newQuote);
+    saveQuotes();
+    showRandomQuote(); // Immediately show the new quote
+    populateCategories(); // Update the dropdown if a new category is added
+    document.querySelector("#newQuoteText").value = "";
+    document.querySelector("#newQuoteCategory").value = "";
   }
 
   // Export quotes to JSON file
@@ -142,11 +170,25 @@ document.addEventListener("DOMContentLoaded", () => {
     fileReader.readAsText(event.target.files[0]);
   }
 
-  // Initialize the app on page load
-  loadQuotes(); // Load saved quotes from localStorage
-  populateCategories(); // Populate the category dropdown
+  // Create the "Add Quote" form
+  function createAddQuoteForm() {
+    const formContainer = document.createElement("div");
+    formContainer.innerHTML = `
+      <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+      <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+      <button id="addNewQuote">Add Quote</button>
+    `;
+    document.body.appendChild(formContainer);
 
-  // Check if there's a last viewed quote in sessionStorage
+    // Add event listener for adding new quotes
+    const addNewQuoteButton = formContainer.querySelector("#addNewQuote");
+    addNewQuoteButton.addEventListener("click", addQuote);
+  }
+
+  // Initialize the app on page load
+  loadQuotes();
+  populateCategories();
+
   const lastViewedQuote = sessionStorage.getItem("lastViewedQuote");
   if (lastViewedQuote) {
     quoteDisplay.textContent = lastViewedQuote;
@@ -154,11 +196,12 @@ document.addEventListener("DOMContentLoaded", () => {
     showRandomQuote();
   }
 
-  createAddQuoteForm(); // Add the form to the page
-
   // Event Listeners
   newQuote.addEventListener("click", showRandomQuote);
   categorySelect.addEventListener("change", filterQuotes);
   exportQuotesBtn.addEventListener("click", exportQuotes);
   importFileInput.addEventListener("change", importFromJsonFile);
+
+  // Create the form for adding new quotes
+  createAddQuoteForm();
 });
