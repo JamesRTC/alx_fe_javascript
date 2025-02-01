@@ -20,7 +20,10 @@ document.addEventListener("DOMContentLoaded", () => {
     { text: "The mind is everything. What you think you become.", category: "Mindset" },
   ];
 
-  newQuote.addEventListener("click", showRandomQuote);
+  newQuote.addEventListener("click", () => {
+    let randomNum = Math.floor(Math.random() * quotes.length);
+    quoteDisplay.textContent = quotes[randomNum].text;
+  });
 
   // Extract unique categories from the quotes array
   let categories = [...new Set(quotes.map((q) => q.category))];
@@ -34,10 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Function to show a random quote
-  function showRandomQuote() {
-    let randomNum = Math.floor(Math.random() * quotes.length);
-    quoteDisplay.textContent = quotes[randomNum].text;
-  }
+  // function showRandomQuote() {
+  //   let randomNum = Math.floor(Math.random() * quotes.length);
+  //   quoteDisplay.textContent = quotes[randomNum].text;
+  // }
 
   // Function to add a new quote
   function addQuote() {
