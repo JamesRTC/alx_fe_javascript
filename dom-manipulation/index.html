@@ -12,10 +12,11 @@
     <div id="quoteDisplay"></div>
 
     <!-- Filter Quotes by Category -->
-    <select id="quoteCategoryFilter">
+    <select id="categoryFilter" onchange="filterQuotes()">
       <option value="all">All Categories</option>
       <!-- Categories will be populated dynamically -->
     </select>
+
     <button id="filterQuote">Show Quote by Category</button>
 
     <!-- Button to show random quote -->
