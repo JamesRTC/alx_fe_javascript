@@ -127,7 +127,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Add new quote to the quotes array and update local storage
+  // Add new quote to the server via POST request
+  async function addQuoteToServer(newQuote) {
+    try {
+      const response = await fetch(serverUrl, {
+        method: "POST", // Set method to POST
+        headers: {
+          "Content-Type": "application/json", // Specify the content type
+        },
+        body: JSON.stringify(newQuote), // Send the quote as JSON in the body
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add the quote to the server.");
+      }
+
+      const data = await response.json();
+      console.log("Quote added successfully to the server:", data);
+    } catch (error) {
+      console.error("Error adding quote to server:", error);
+    }
+  }
+
+  // Modify addQuote to also send the new quote to the server
   function addQuote() {
     const newQuoteText = document.querySelector("#newQuoteText").value.trim();
     const newQuoteCategory = document.querySelector("#newQuoteCategory").value.trim();
@@ -144,6 +166,9 @@ document.addEventListener("DOMContentLoaded", () => {
     populateCategories(); // Update the dropdown if a new category is added
     document.querySelector("#newQuoteText").value = "";
     document.querySelector("#newQuoteCategory").value = "";
+
+    // Send the new quote to the server
+    addQuoteToServer(newQuote);
   }
 
   // Export quotes to JSON file
