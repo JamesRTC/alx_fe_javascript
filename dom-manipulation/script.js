@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Sync local quotes with the server data
-  async function syncWithServer() {
+  async function syncQuotes() {
     const serverQuotes = await fetchQuotesFromServer();
 
     // Compare and update quotes - in case of conflict, server data takes precedence
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Simulate periodic syncing with the server (every 30 seconds)
-  setInterval(syncWithServer, 30000);
+  setInterval(syncQuotes, 30000);
 
   // Populate the category dropdown dynamically
   function populateCategories() {
