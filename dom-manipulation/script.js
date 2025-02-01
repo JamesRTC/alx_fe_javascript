@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     saveQuotes();
     populateCategories(); // Update category dropdown after sync
-    alert("Data synced with the server!");
+    alert("Quotes synced with server!");
   }
 
   // Simulate periodic syncing with the server (every 30 seconds)
