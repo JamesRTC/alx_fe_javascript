@@ -8,6 +8,7 @@
   <body>
     <h1>Dynamic Quote Generator</h1>
 
+    <!-- Display a Quote -->
     <div id="quoteDisplay"></div>
 
     <!-- Filter Quotes by Category -->
@@ -23,6 +24,9 @@
     <!-- Import/Export Quote functionality -->
     <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
     <button id="exportQuotes">Export Quotes</button>
+
+    <!-- Add New Quote Form (dynamically created) -->
+    <!-- This will be inserted into the body by JavaScript when needed -->
 
     <script src="script.js"></script>
   </body>

@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const quoteDisplay = document.querySelector("#quoteDisplay");
   const newQuote = document.querySelector("#newQuote");
   const addQuoteBtn = document.querySelector("#addQuote");
-  const categorySelect = document.querySelector("#quoteCategoryFilter");
+  const categorySelect = document.getElementById("quoteCategoryFilter");
   const importFileInput = document.querySelector("#importFile");
   const exportQuotesBtn = document.querySelector("#exportQuotes");
 
@@ -93,11 +93,20 @@ document.addEventListener("DOMContentLoaded", () => {
       option.textContent = category;
       categorySelect.appendChild(option);
     });
+
+    // Load the last selected category from localStorage (if any)
+    const savedCategory = localStorage.getItem("selectedCategory");
+    if (savedCategory) {
+      categorySelect.value = savedCategory;
+    }
   }
 
   // Filter quotes by selected category
   function filterQuotesByCategory() {
     const selectedCategory = categorySelect.value;
+    // Save the selected category to localStorage
+    localStorage.setItem("selectedCategory", selectedCategory);
+
     if (selectedCategory === "all") {
       showRandomQuote();
     } else {
@@ -151,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Event Listeners
   newQuote.addEventListener("click", showRandomQuote);
-  document.querySelector("#filterQuote").addEventListener("click", filterQuotesByCategory);
+  categorySelect.addEventListener("change", filterQuotesByCategory); // Listen for category changes
   exportQuotesBtn.addEventListener("click", exportQuotes);
   importFileInput.addEventListener("change", importFromJsonFile);
 });
